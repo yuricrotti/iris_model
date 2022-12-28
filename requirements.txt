@@ -37,8 +37,6 @@ pyarrow==10.0.1
 PyJWT==2.6.0
 pyparsing==3.0.9
 pytest==7.2.0
-pytz==2022.7
-pywin32==305.1
 PyYAML==6.0
 querystring-parser==1.2.4
 requests==2.28.1
