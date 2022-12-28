@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>ML API</title>
+    <!-- Add a font stack -->
+    <link href='https://fonts.googleapis.com/css?family=Pacifico|Arimo|Hind:300|Open+Sans+Condensed:300'
+        rel='stylesheet' type='text/css'>
+    <!-- Use a CSS framework to make the website responsive -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Add your own custom stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Use a container element to center the form and give it a fixed width -->
+        <div class="login">
+            <h1>Iris Flower Classifier</h1>
+            <figure>
+                <img src="https://data-flair.training/blogs/wp-content/uploads/sites/2/2021/10/iris-flower.webp"
+                    style="width:50%">
+                <figcaption></figcaption>
+            </figure>
+            <form method="POST">
+                <!-- Use CSS to style the form elements -->
+                <input type="text" name="SepalLengthCm" placeholder="SepalLength (cm)" required class="input-field">
+                <input type="text" name="SepalWidthCm" placeholder="SepalWidth (cm)" required class="input-field">
+                <input type="text" name="PetalLengthCm" placeholder="PetalLength (cm)" required class="input-field">
+                <input type="text" name="PetalWidthCm" placeholder="PetalWidth (cm)" required class="input-field">
+                <button type="submit" class="btn btn-primary btn-block btn-large">Classify</button>
+            </form>
+            <br>
+            {{ prediction_text }}
+            <br>
+            
+            {% if prediction_text == "Iris-versicolor" %}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/Iris_versicolor_4.jpg" style="width: 200px; height: 200px;" alt="Iris-versicolor">
+            {% elif prediction_text == "Iris-setosa" %}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Irissetosa1.jpg" style="width: 200px; height: 200px;" alt="Iris-setosa">
+            {% elif prediction_text == "Iris-virginica" %}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Iris_virginica_2.jpg/800px-Iris_virginica_2.jpg" style="width: 200px; height: 200px;" alt="Iris-virginica">
+            {% endif %}
+            
+        </div>
+    </div>
+    <!-- Add a JavaScript library for the CSS framework -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/

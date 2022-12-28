@@ -1,0 +1,31 @@
+stages:
+  raw_dataset_creation:
+    cmd: python src/data/load_data.py --config=params.yaml
+    deps:
+    - src/data/load_data.py
+    - data/external/Iris.csv
+    outs:
+    - data/raw/train.csv
+  
+  split_data:
+    cmd: python src/data/split_data.py --config=params.yaml
+    deps:
+    - src/data/split_data.py
+    - data/raw/train.csv
+    outs:
+    - data/processed/iris_train.csv
+    - data/processed/iris_test.csv
+
+  model_train:
+    cmd: python src/models/train_model.py --config=params.yaml
+    deps:
+    - data/processed/iris_train.csv
+    - data/processed/iris_test.csv
+    - src/models/train_model.py
+
+  log_production_model:
+    cmd: python src/models/production_model_selection.py --config=params.yaml
+    deps:
+    - src/models/production_model_selection.py
+    outs:
+    - models/model.joblib
