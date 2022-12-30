@@ -61,15 +61,17 @@ def train_and_evaluate(config_path):
     config_path : _type_
         _description_
     """
-    # read config file
+    # Read config file
     config = read_params(config_path)
     train_data_path = config["processed_data_config"]["train_data_csv"]
     test_data_path = config["processed_data_config"]["test_data_csv"]
     target = config["raw_data_config"]["target"]
 
+    # Read Train and Test data
     train = pd.read_csv(train_data_path, sep=",")
     test = pd.read_csv(test_data_path, sep=",")
 
+    # Get features and target variables
     train_x, train_y = get_feat_and_target(train,target)
     test_x, test_y = get_feat_and_target(test,target)
 
@@ -80,12 +82,16 @@ def train_and_evaluate(config_path):
     mlflow.set_tracking_uri(remote_server_uri)
     mlflow.set_experiment(mlflow_config["experiment_name"])
 
+    # Start a new run
     with mlflow.start_run(run_name=mlflow_config["run_name"]) as mlops_run:
 
         # Define parameter grid for grid search
         param_grid = {'n_estimators': [1, 10, 50, 100, 200],
-                      'max_samples': [0.1, 0.5, 1.0, 1, 5, 10]}
-
+                      'max_samples': [0.1, 0.5, 1.0, 1, 5, 10],
+                      'max_features': [1, 2, 3, 4],
+                      'max_depth': [1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100]}
+        
+        # Create the model
         model = RandomForestClassifier()
 
         # Create the grid search object
@@ -113,7 +119,7 @@ def train_and_evaluate(config_path):
         mlflow.log_metric("recall", recall)
         mlflow.log_metric("f1_score", f1score)
 
-        # 
+        # Tracking URI
         tracking_url_type_store = urlparse(mlflow.get_artifact_uri()).scheme
 
         # Model registry does not work with file store

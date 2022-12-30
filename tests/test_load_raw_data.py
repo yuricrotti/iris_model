@@ -4,7 +4,8 @@ import pandas as pd
 # import sys
 # sys.path.append("/src/data")
 from src.data.load_data import load_raw_data
-#from load_data import load_raw_data
+
+
 
 def test_load_raw_data():
     # Create a temporary directory to store the raw data

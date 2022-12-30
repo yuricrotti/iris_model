@@ -24,10 +24,11 @@ def split_data(dataframe : pd.DataFrame,
     random_state : int
         random state
     """
+    # Split the data
     train, test = train_test_split(dataframe,
                                    test_size = split_ratio,
                                    random_state=random_state)
-
+    # Save the data
     train.to_csv(train_data_path, sep=",", index=False, encoding="utf-8")
     test.to_csv(test_data_path, sep=",", index=False, encoding="utf-8")
 
@@ -39,13 +40,18 @@ def split_and_saved_data(config_path: str):
     config_path : str
         config path
     """
+    # read the config file
     config = read_params(config_path)
     raw_data_path = config["raw_data_config"]["raw_data_csv"]
     test_data_path = config["processed_data_config"]["test_data_csv"] 
     train_data_path = config["processed_data_config"]["train_data_csv"]
     split_ratio = config["raw_data_config"]["train_test_split_ratio"]
     random_state = config["raw_data_config"]["random_state"]
+
+    # read the raw data
     raw_df=pd.read_csv(raw_data_path)
+
+    # split the data
     split_data(raw_df,train_data_path,test_data_path,split_ratio,random_state)
 
 if __name__=="__main__":
