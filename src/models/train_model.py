@@ -22,44 +22,61 @@ def read_params(config_path):
         config = yaml.safe_load(yaml_file)
     return config
 
-def get_feat_and_target(df,target):
-    """
-    Get features and target variables seperately from given dataframe and target 
-    input: dataframe and target column
-    output: two dataframes for x and y 
+def get_feat_and_target(df: pd.DataFrame, target: str) -> tuple :
+    """Function to get the features and target from the dataframe
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Dataframe from which features and target are to be extracted
+    target : str
+        Name of the target column
+
+    Returns
+    -------
+    tuple
+        Tuple of features and target
     """
     x=df.drop(target,axis=1)
     y=df[[target]]
-    return x,y    
+    return x,y
 
-def accuracymeasures(y_test,predictions,avg_method):
+def accuracymeasures(y_test, predictions, avg_method, labels=None, output_format=None):
+    """
+    Function to calculate the metrics
+    """
+    # Calculate performance measures
     accuracy = accuracy_score(y_test, predictions)
     precision = precision_score(y_test, predictions, average=avg_method)
     recall = recall_score(y_test, predictions, average=avg_method)
     f1score = f1_score(y_test, predictions, average=avg_method)
-    print("Classification report")
-    print("---------------------","\n")
-    print(classification_report(y_test, predictions),"\n")
-    print("Confusion Matrix")
-    print("---------------------","\n")
-    print(confusion_matrix(y_test, predictions),"\n")
 
-    print("Accuracy Measures")
-    print("---------------------","\n")
-    print("Accuracy: ", accuracy)
-    print("Precision: ", precision)
-    print("Recall: ", recall)
-    print("F1 Score: ", f1score)
+    # Print the classification report and confusion matrix
+    if output_format is None or output_format.get('classification_report', True):
+        print("Classification report")
+        print("---------------------","\n")
+        print(classification_report(y_test, predictions, labels=labels),"\n")
+    if output_format is None or output_format.get('confusion_matrix', True):
+        print("Confusion Matrix")
+        print("---------------------","\n")
+        print(confusion_matrix(y_test, predictions, labels=labels),"\n")
 
-    return accuracy,precision,recall,f1score
+    # Print the accuracy measures
+    if output_format is None or output_format.get('accuracy_measures', True):
+        print("Accuracy Measures")
+        print("---------------------","\n")
+        print("Accuracy: {:.4f}".format(accuracy))
+        print("Precision: {:.4f}".format(precision))
+
+    return accuracy, precision, recall, f1score
 
 def train_and_evaluate(config_path):
-    """_summary_
+    """ Function to train and evaluate the model
 
     Parameters
     ----------
-    config_path : _type_
-        _description_
+    config_path : str
+        Path to the yaml file
     """
     # Read config file
     config = read_params(config_path)
@@ -86,11 +103,13 @@ def train_and_evaluate(config_path):
     with mlflow.start_run(run_name=mlflow_config["run_name"]) as mlops_run:
 
         # Define parameter grid for grid search
-        param_grid = {'n_estimators': [1, 10, 50, 100, 200],
-                      'max_samples': [0.1, 0.5, 1.0, 1, 5, 10],
-                      'max_features': [1, 2, 3, 4],
-                      'max_depth': [1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100]}
-        
+        param_grid = {
+            'n_estimators': [10, 50, 100, 200],
+            'max_depth': [None, 10, 20, 30],
+            'min_samples_split': [2, 5, 10],
+            'min_samples_leaf': [1, 2, 4],
+            }
+                
         # Create the model
         model = RandomForestClassifier()
 
@@ -98,7 +117,7 @@ def train_and_evaluate(config_path):
         grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=3)
 
         # Fit the grid search to the data
-        grid_search.fit(train_x, train_y)
+        grid_search.fit(train_x, train_y.values.ravel())
 
         # Save the best model and parameters
         best_model = grid_search.best_estimator_
@@ -108,7 +127,7 @@ def train_and_evaluate(config_path):
         y_pred = best_model.predict(test_x)
 
         # Calculate metrics
-        accuracy, precision, recall, f1score = accuracymeasures(test_y,y_pred,'weighted')
+        accuracy, precision, recall, f1score = accuracymeasures(test_y,y_pred,'macro')
 
         # Log the parameters
         mlflow.log_param("params", best_params)
