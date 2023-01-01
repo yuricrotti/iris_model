@@ -7,7 +7,7 @@ raw_data_config:
   train_test_split_ratio: 0.3
   target: Species 
   random_state: 111
-  new_train_data_csv: data/raw/train_new.csv
+  new_train_data_csv: data/raw/new_train.csv
 
 processed_data_config:
   train_data_csv: data/processed/iris_train.csv
@@ -19,15 +19,11 @@ mlflow_config:
   run_name: random_forest
   registered_model_name: random_forest_model
   remote_server_uri: http://localhost:1234
- 
-random_forest: 
-  max_depth: 10
-  n_estimators: 30
 
 model_dir: models/model.joblib
 
 model_webapp_dir: webapp/model_webapp_dir/model.joblib
 
 model_monitor:
-  target_col_name: target
+  target_col_name: Species
   monitor_dashboard_html: reports/data_and_target_drift_dashboard.html
